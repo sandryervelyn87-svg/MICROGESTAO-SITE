@@ -28,6 +28,8 @@ jobs:
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Preparar arquivos estáticos
         run: |
