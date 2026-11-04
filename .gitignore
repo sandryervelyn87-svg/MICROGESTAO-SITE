@@ -1,0 +1,15 @@
+# Local databases and SQLite sidecar files
+app/*.db
+app/*.db-*
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.env
+
+# Python-generated files and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/

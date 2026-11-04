@@ -1,0 +1,143 @@
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL,
+    google_id VARCHAR(100),
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS business_profiles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    business_name VARCHAR(120) NOT NULL,
+    owner_name VARCHAR(100) NOT NULL,
+    initials VARCHAR(4) NOT NULL,
+    role VARCHAR(80) NOT NULL DEFAULT 'Proprietário(a)',
+    preferences TEXT NOT NULL DEFAULT '{}',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS sessoes (
+    token_hash CHAR(64) PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    expira_em DATETIME NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS recuperacao_senha (
+    token_hash CHAR(64) PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    expira_em DATETIME NOT NULL,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS categorias (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    nome VARCHAR(50) NOT NULL,
+    UNIQUE (usuario_id, nome),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS produtos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    categoria_id INTEGER,
+    nome VARCHAR(100) NOT NULL,
+    quantidade INTEGER NOT NULL DEFAULT 0 CHECK (quantidade >= 0),
+    preco_custo DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (preco_custo >= 0),
+    preco_venda DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (preco_venda >= 0),
+    estoque_minimo INTEGER NOT NULL DEFAULT 5 CHECK (estoque_minimo >= 0),
+    imagem_url TEXT,
+    icone VARCHAR(12) NOT NULL DEFAULT '▦',
+    atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS fornecedores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    nome_empresa VARCHAR(120) NOT NULL,
+    categoria VARCHAR(60),
+    contato_nome VARCHAR(100),
+    telefone VARCHAR(20),
+    email VARCHAR(100),
+    observacoes TEXT,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS vendas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    data_venda DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    valor_total DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (valor_total >= 0),
+    descricao VARCHAR(160) NOT NULL DEFAULT 'Venda',
+    forma_pagamento VARCHAR(30) NOT NULL DEFAULT 'PIX',
+    sincronizado BOOLEAN NOT NULL DEFAULT 1,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS losses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    product_id INTEGER,
+    product_name VARCHAR(100) NOT NULL,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
+    reason VARCHAR(40) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES produtos(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS expenses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    description VARCHAR(160) NOT NULL,
+    category VARCHAR(40) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
+    expense_date TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    kind VARCHAR(40) NOT NULL,
+    title VARCHAR(120) NOT NULL,
+    description VARCHAR(300) NOT NULL,
+    entity_key VARCHAR(120),
+    is_read BOOLEAN NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS itens_venda (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    venda_id INTEGER NOT NULL,
+    produto_id INTEGER NOT NULL,
+    nome_produto VARCHAR(100) NOT NULL,
+    quantidade INTEGER NOT NULL CHECK (quantidade > 0),
+    preco_unitario DECIMAL(10,2) NOT NULL CHECK (preco_unitario >= 0),
+    subtotal DECIMAL(10,2) NOT NULL CHECK (subtotal >= 0),
+    FOREIGN KEY (venda_id) REFERENCES vendas(id) ON DELETE CASCADE,
+    FOREIGN KEY (produto_id) REFERENCES produtos(id) ON DELETE RESTRICT
+);
+
+CREATE INDEX IF NOT EXISTS idx_produtos_usuario ON produtos(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_fornecedores_usuario ON fornecedores(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_vendas_usuario_data ON vendas(usuario_id, data_venda);
+CREATE INDEX IF NOT EXISTS idx_sessoes_expira ON sessoes(expira_em);
+CREATE INDEX IF NOT EXISTS idx_recuperacao_senha_usuario ON recuperacao_senha(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_perdas_usuario_data ON losses(user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_gastos_usuario_data ON expenses(user_id, expense_date);
+CREATE INDEX IF NOT EXISTS idx_notificacoes_usuario ON notifications(user_id, is_read, created_at);

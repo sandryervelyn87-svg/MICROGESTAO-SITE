@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#123c66">
+    <meta name="description" content="Controle simples de produtos, estoque e vendas para pequenos negócios.">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon-192.png" type="image/png">
+    <link rel="stylesheet" href="/styles.css">
+    <title>MicroGestão — seu negócio em ordem</title>
+  </head>
+  <body>
+    <section class="auth-screen" id="auth-screen">
+      <div class="auth-brand">
+        <a class="brand" href="/" aria-label="MicroGestão">
+          <img class="brand-logo" src="/logo.png" alt="MicroGestão">
+        </a>
+        <div class="auth-intro">
+          <span class="eyebrow">GESTÃO SIMPLES, DIA A DIA MAIS LEVE</span>
+          <h1>Seu negócio organizado.<br><em>Seu dia mais leve.</em></h1>
+          <p>Controle vendas, estoque e gastos em um só lugar, sem planilhas complicadas.</p>
+        </div>
+        <div class="auth-decoration" aria-hidden="true">
+            <div class="decoration-card"><span>Seu negócio</span><strong>Tudo em ordem</strong><i>Mais clareza no dia a dia</i></div>
+          <div class="decoration-stamp">feito<br>pra você</div>
+        </div>
+        <p class="auth-footer">Um jeito mais tranquilo de cuidar do seu negócio.</p>
+      </div>
+      <div class="auth-panel">
+        <div class="auth-form-wrap">
+          <div class="mobile-brand brand">
+            <img class="brand-logo" src="/logo.png" alt="MicroGestão">
+          </div>
+          <div id="auth-content"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="app-shell hidden" id="app-shell">
+      <aside class="sidebar">
+        <a class="brand sidebar-brand" href="#" data-nav="dashboard">
+          <img class="brand-logo" src="/logo.png" alt="MicroGestão">
+        </a>
+        <div class="business-card">
+          <span class="business-avatar" id="business-avatar">MG</span>
+          <span class="business-copy"><strong id="business-name">Meu negócio</strong><small id="business-plan">Plano gratuito</small></span>
+        </div>
+        <span class="nav-label">MENU PRINCIPAL</span>
+        <nav class="main-nav" aria-label="Menu principal">
+          <button class="nav-item active" data-nav="dashboard"><span class="nav-icon">⌂</span>Visão geral</button>
+          <button class="nav-item" data-nav="products"><span class="nav-icon">▦</span>Estoque<span class="nav-count hidden" id="low-stock-badge">0</span></button>
+          <button class="nav-item" data-nav="sales"><span class="nav-icon">↗</span>Vendas</button>
+          <button class="nav-item" data-nav="suppliers"><span class="nav-icon">♧</span>Fornecedores</button>
+          <button class="nav-item" data-nav="losses"><span class="nav-icon">◇</span>Perdas</button>
+          <button class="nav-item" data-nav="expenses"><span class="nav-icon">↘</span>Gastos</button>
+          <button class="nav-item" data-nav="categories"><span class="nav-icon">☷</span>Categorias</button>
+          <button class="nav-item" data-nav="profile"><span class="nav-icon">◎</span>Meu negócio</button>
+        </nav>
+        <div class="sidebar-note">
+          <span class="note-icon">✳</span>
+          <strong>Precisa de ajuda?</strong>
+          <span>Organize seu dia com tranquilidade.</span>
+        </div>
+        <div class="sidebar-user">
+          <span class="user-avatar" id="user-avatar">M</span>
+          <span class="user-copy"><strong id="sidebar-name">Minha conta</strong><small id="sidebar-role"></small></span>
+          <button class="icon-button logout-button" id="logout-button" aria-label="Sair da conta" title="Sair">⤴</button>
+        </div>
+        <button class="logout-link" id="sidebar-logout">Sair da conta</button>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <button class="mobile-menu" id="mobile-menu" aria-label="Abrir menu">☰</button>
+          <div class="breadcrumb">MicroGestão <span>/</span> <strong id="breadcrumb-current">Visão geral</strong></div>
+          <div class="topbar-right">
+            <span class="today-label" id="today-label"></span>
+            <span class="sync-status" id="sync-status"><span class="sync-dot"></span><span id="sync-label">Sincronizado</span></span>
+            <button class="icon-button notification-button" id="notifications-button" aria-label="Notificações">
+              ♧<span class="notification-count hidden" id="notification-count">0</span>
+            </button>
+            <span class="top-avatar" id="top-avatar">M</span>
+          </div>
+        </header>
+        <div class="page-content" id="page-content"></div>
+      </main>
+    </div>
+    <dialog id="app-dialog" class="app-dialog"></dialog>
+    <dialog id="notifications-dialog" class="app-dialog notifications-dialog" aria-labelledby="notifications-title"></dialog>
+    <div class="toast-region" id="toast-region" aria-live="polite"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
