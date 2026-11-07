@@ -1277,8 +1277,8 @@ class MicroGestaoServer(ThreadingHTTPServer):
 
 def main() -> None:
     initialize_database()
-    host = os.environ.get("MICROGESTAO_HOST", "127.0.0.1")
-    port = int(os.environ.get("MICROGESTAO_PORT", "8000"))
+    host = "0.0.0.0"
+    port = int(os.environ.get("PORT", "10000"))
     server = MicroGestaoServer((host, port), MicroGestaoHandler)
     display_host = "127.0.0.1" if host == "0.0.0.0" else host
     print(f"MicroGestão disponível em http://{display_host}:{port}")
